@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * {
+      margin: 0;
+      padding: 0
+    }
+
+    html {
+      width: 100%;
+      height: 100%;
+
+    }
+
+    body {
+      width: 95%;
+      height: 95%;
+    }
+
+    .box {
+      width: 300px;
+      height: 300px;
+      position: absolute;
+      top: 100px;
+      left: 100px;
+    }
+
+    .box .t,
+    .box .b,
+    .box .l,
+    .box .r {
+      position: absolute;
+      z-index: 1;
+      background: #666;
+    }
+
+    .box .l,
+    .box .r {
+      width: 5px;
+      height: 100%;
+      cursor: col-resize;
+    }
+
+    .box .t,
+    .box .b {
+      width: 100%;
+      height: 5px;
+      cursor: row-resize;
+    }
+
+    .box .t {
+      top: 0;
+    }
+
+    .box .b {
+      bottom: 0;
+    }
+
+    .box .l {
+      left: 0;
+    }
+
+    .box .r {
+      right: 0;
+    }
+
+    .inner {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="box" id="odiv">
+    <span class="r" id="true"></span>
+    <span class="l" id="true"></span>
+    <span class="t" id="true"></span>
+    <span class="b" id="true"></span>
+    <div class="inner"></div>
+  </div>
+  <script>
+    window.onload = function () {
+      let isDrag = true
+      var oDiv = document.getElementsByTagName('div')[0];
+      oDiv.style.width = '500px';
+      var aSpan = oDiv.getElementsByTagName('span');
+      for (var i = 0; i < aSpan.length; i++) {
+        dragFn(aSpan[i]);
+      }
+      function dragFn(obj) {
+        obj.addEventListener('mouseover', function () {
+          obj.style.backgroundColor = '#00cdcd';
+        });
+
+        obj.addEventListener('mouseout', function () {
+          obj.style.backgroundColor = obj.id == 'true' ? '#666' : 'red';
+        });
+        obj.onmousedown = function (ev) {
+          var oEv = ev || event;
+          oEv.stopPropagation();
+          var oldWidth = oDiv.offsetWidth;
+          var oldHeight = oDiv.offsetHeight;
+          var oldX = oEv.clientX;
+          var oldY = oEv.clientY;
+          var oldLeft = oDiv.offsetLeft;
+          var oldTop = oDiv.offsetTop;
+
+          document.onmousemove = function (ev) {
+            obj.id = isDrag ? 'true' : 'false'
+            var oEv = ev || event;
+            let disY = (oldTop + (oEv.clientY - oldY)),
+              disX = (oldLeft + (oEv.clientX - oldLeft));
+            if (disX > oldLeft + oldWidth) {
+              disX = oldLeft + oldWidth
+            }
+            if (disY > oldTop + oldHeight) {
+              disY = oldTop + oldHeight
+            }
+            if (obj.id == 'true') {
+              if (obj.className == 't') {
+                oDiv.style.height = oldHeight - (oEv.clientY - oldY) + 'px';
+                oDiv.style.top = disY + 'px';
+              }
+              if (obj.className == 'b') {
+                oDiv.style.height = oldHeight + (oEv.clientY - oldY) + 'px';
+                oDiv.style.bottom = disY + 'px';
+              }
+              if (obj.className == 'l') {
+                oDiv.style.height = oldHeight + 'px';
+                oDiv.style.width = oldWidth - (oEv.clientX - oldX) + 'px';
+                oDiv.style.left = disX + 'px';
+              }
+              if (obj.className == 'r') {
+                oDiv.style.height = oldHeight + 'px';
+                oDiv.style.width = oldWidth + (oEv.clientX - oldX) + 'px';
+                oDiv.style.right = disX + 'px';
+              }
+            } else {
+              obj.style.backgroundColor = 'red';
+            }
+          };
+
+          document.onmouseup = function () {
+            document.onmousemove = null;
+          };
+          return false;
+        };
+      }
+      document.getElementById("odiv").onmousedown = function (ev) {
+        var oevent = ev || event;
+        oevent.preventDefault();
+
+        var distanceX = oevent.clientX - oDiv.offsetLeft;
+        var distanceY = oevent.clientY - oDiv.offsetTop;
+
+        document.onmousemove = function (ev) {
+          var oevent = ev || event;
+          oDiv.style.left = oevent.clientX - distanceX + 'px';
+          oDiv.style.top = oevent.clientY - distanceY + 'px';
+        };
+        document.onmouseup = function () {
+          document.onmousemove = null;
+          document.onmouseup = null;
+        };
+      }
+      let a = document.getElementsByTagName('body')[0]
+      let x1 = a.offsetLeft
+      let y1 = a.offsetTop
+      let x2 = a.offsetLeft + a.offsetWidth
+      let y2 = a.offsetLeft + a.offsetHeight
+      let b = document.getElementsByTagName('html')[0]
+      b.onmousemove = (e) => {
+        if (e.clientX - 15 > x1 && e.clientX - 15 > x1 && e.clientX - 15 < x2 && e.clientY - 15 > y1 && e.clientY - 15 < y2) {
+          isDrag = true
+        } else {
+          isDrag = false
+        }
+      }
+    };
+
+  </script>
+</body>
+
+</html>
